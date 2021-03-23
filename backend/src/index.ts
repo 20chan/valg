@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 8080;
 
 const app = express();
 
-app.use('/valg', router);
+app.use('/valg/api', router);
 
 const server = app.listen(PORT, () => {
     logger.info(`server started at localhost:${PORT}`);
