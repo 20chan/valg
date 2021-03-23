@@ -27,18 +27,22 @@ export class ServerManager {
 
     public async start() {
         await start();
+        await this.fetchStatus();
+        await this.fetchResource();
         this.startJob();
     }
 
     public async stop() {
         await stop();
         await this.fetchStatus();
+        await this.fetchResource();
         this.stopJob();
     }
 
     private async fetchStatus() {
         const { active, pid } = await status();
         this.pid = active ? null : pid;
+        this.lastStatus = new Date();
     }
 
     private async fetchResource() {
@@ -50,20 +54,13 @@ export class ServerManager {
             this.cpu = null;
             this.mem = null;
         }
+        this.lastResource = new Date();
     }
 
     private startJob() {
         this.stopJob();
-        this.jobStatus = setInterval(async () => {
-            await this.fetchStatus();
-            this.lastStatus = new Date();
-        }, 60 * 1000);
-        this.jobResource = setInterval(async () => {
-            if (this.pid) {
-                await this.fetchResource();
-                this.lastResource = new Date();
-            }
-        }, 1000);
+        this.jobStatus = setInterval(this.fetchStatus, 60 * 1000);
+        this.jobResource = setInterval(this.fetchResource, 1000);
     }
 
     private stopJob() {

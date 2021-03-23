@@ -14,7 +14,7 @@ router.post('/start', async (req, resp) => {
 });
 
 router.post('/stop', async (req, resp) => {
-    await manager.start();
+    await manager.stop();
     resp.json({ isSuccess: true });
 });
 
