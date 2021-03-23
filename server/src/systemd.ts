@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import logger from './logger';
 
 const execAsync = promisify(exec);
 
@@ -33,6 +34,11 @@ export const status = async () => {
     const parsePid = (out: string) => {
         const line = out.split('\n')[9];
         const match = line.match(/└─([0-9]*).*/);
+        logger.debug('status parsing', {
+            out,
+            line,
+            match,
+        });
         return match ? parseInt(match[1], 10) : 0;
     };
 

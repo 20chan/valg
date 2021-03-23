@@ -1,4 +1,5 @@
 import express from 'express';
+import logger from './logger';
 import router from './router';
 
 const PORT = process.env.PORT || 8080;
@@ -8,5 +9,5 @@ const app = express();
 app.use('/valg', router);
 
 const server = app.listen(PORT, () => {
-    console.log(`server started at localhost:${PORT}`)
+    logger.info(`server started at localhost:${PORT}`);
 });

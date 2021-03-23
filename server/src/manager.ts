@@ -1,3 +1,4 @@
+import logger from './logger';
 import { start, stop, status, resource } from './systemd';
 
 export class ServerManager {
@@ -10,6 +11,16 @@ export class ServerManager {
 
     private lastStatus: Date | null;
     private lastResource: Date | null;
+
+    constructor() {
+        this.pid = null;
+        this.cpu = null;
+        this.mem = null;
+        this.jobStatus = null;
+        this.jobResource = null;
+        this.lastStatus = null;
+        this.lastResource = null;
+    }
 
     public get active(): boolean {
         return !!this.pid;
@@ -27,21 +38,25 @@ export class ServerManager {
 
     public async start() {
         await start();
-        await this.fetchStatus();
-        await this.fetchResource();
+        await this.fetch();
         this.startJob();
     }
 
     public async stop() {
         await stop();
+        await this.fetch();
+        this.stopJob();
+    }
+
+    public async fetch() {
         await this.fetchStatus();
         await this.fetchResource();
-        this.stopJob();
     }
 
     private async fetchStatus() {
         const { active, pid } = await status();
-        this.pid = active ? null : pid;
+        logger.verbose('fetch status', { active, pid });
+        this.pid = active ? pid : null;
         this.lastStatus = new Date();
     }
 
@@ -54,6 +69,11 @@ export class ServerManager {
             this.cpu = null;
             this.mem = null;
         }
+        logger.verbose('fetch resource', {
+            pid: this.pid,
+            cpu: this.cpu,
+            mem: this.mem,
+        });
         this.lastResource = new Date();
     }
 
