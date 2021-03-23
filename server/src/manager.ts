@@ -5,7 +5,13 @@ export class ServerManager {
     private cpu: number | null;
     private mem: number | null;
 
-    public get active() : boolean {
+    private jobStatus: ReturnType<typeof setInterval> | null;
+    private jobResource: ReturnType<typeof setInterval> | null;
+
+    private lastStatus: Date | null;
+    private lastResource: Date | null;
+
+    public get active(): boolean {
         return !!this.pid;
     }
 
@@ -14,7 +20,20 @@ export class ServerManager {
             pid: this.pid,
             cpu: this.cpu,
             mem: this.mem,
+            lastStatus: this.lastStatus,
+            lastResource: this.lastResource,
         };
+    }
+
+    public async start() {
+        await start();
+        this.startJob();
+    }
+
+    public async stop() {
+        await stop();
+        await this.fetchStatus();
+        this.stopJob();
     }
 
     private async fetchStatus() {
@@ -30,6 +49,31 @@ export class ServerManager {
         } else {
             this.cpu = null;
             this.mem = null;
+        }
+    }
+
+    private startJob() {
+        this.stopJob();
+        this.jobStatus = setInterval(async () => {
+            await this.fetchStatus();
+            this.lastStatus = new Date();
+        }, 60 * 1000);
+        this.jobResource = setInterval(async () => {
+            if (this.pid) {
+                await this.fetchResource();
+                this.lastResource = new Date();
+            }
+        }, 1000);
+    }
+
+    private stopJob() {
+        if (this.jobStatus !== null) {
+            clearInterval(this.jobStatus);
+            this.jobStatus = null;
+        }
+        if (this.jobResource !== null) {
+            clearInterval(this.jobResource);
+            this.jobResource = null;
         }
     }
 }
