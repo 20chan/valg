@@ -5,9 +5,13 @@
 
 ## Progress
 
-- [ ] backend
+- [x] backend
   - [x] fetch service status/resource
   - [x] trigger service active/inactive
-  - [ ] api route
-- [ ] frontend
+  - [ ] backup/download/upload world data
+  - [x] api route
+- [x] frontend
+  - [x] fetch status
+  - [x] monitor resources
+  - [x] trigger start/stop
 
