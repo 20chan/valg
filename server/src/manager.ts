@@ -38,29 +38,31 @@ export class ServerManager {
 
     public async start() {
         await start();
-        await this.fetch();
+        await this.fetch(false);
         this.startJob();
     }
 
     public async stop() {
         await stop();
-        await this.fetch();
+        await this.fetch(false);
         this.stopJob();
     }
 
-    public async fetch() {
-        await this.fetchStatus();
-        await this.fetchResource();
+    public async fetch(log: boolean) {
+        await this.fetchStatus(log);
+        await this.fetchResource(log);
     }
 
-    private async fetchStatus() {
+    private async fetchStatus(log: boolean) {
         const { active, pid } = await status();
-        logger.verbose('fetch status', { active, pid });
+        if (log) {
+            logger.verbose('fetch status', { active, pid });
+        }
         this.pid = active ? pid : null;
         this.lastStatus = new Date();
     }
 
-    private async fetchResource() {
+    private async fetchResource(log: boolean) {
         if (this.pid) {
             const { status } = await resource(this.pid);
             this.cpu = status?.cpu ?? null;
@@ -69,18 +71,20 @@ export class ServerManager {
             this.cpu = null;
             this.mem = null;
         }
-        logger.verbose('fetch resource', {
-            pid: this.pid,
-            cpu: this.cpu,
-            mem: this.mem,
-        });
+        if (log) {
+            logger.verbose('fetch resource', {
+                pid: this.pid,
+                cpu: this.cpu,
+                mem: this.mem,
+            });
+        }
         this.lastResource = new Date();
     }
 
     private startJob() {
         this.stopJob();
-        this.jobStatus = setInterval(this.fetchStatus, 60 * 1000);
-        this.jobResource = setInterval(this.fetchResource, 1000);
+        this.jobStatus = setInterval(() => this.fetchStatus(false), 60 * 1000);
+        this.jobResource = setInterval(() => this.fetchResource(false), 1000);
     }
 
     private stopJob() {

@@ -15,7 +15,7 @@ const logger = winston.createLogger({
     ),
     transports: [
         new winstonDaily({
-            level: 'debug',
+            level: 'verbose',
             datePattern: 'YYYY-MM-DD',
             dirname: LOG_DIR,
             filename: `%DATE%.log`,

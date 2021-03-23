@@ -25,7 +25,7 @@ router.post('/stop', async (req, resp) => {
 
 router.post('/fetch', async (req, resp) => {
     logger.info('triggered fetch');
-    await manager.fetch();
+    await manager.fetch(true);
     logger.info('triggered fetch:finished');
     resp.json({ isSuccess: true });
 });
