@@ -17,3 +17,8 @@
   - [x] monitor resources
   - [x] trigger start/stop
 
+## run
+
+baseurl때문에 react-scripts build + serve 로 돌리기가 까다롭다
+
+일단 수동으로 react-scripts build 이후 build 디렉터리의 index.html을 제외한 모든 파일을 build/valg/ 디렉터리로 옮겨서 serve -s build -l 8081 로 돌린다
